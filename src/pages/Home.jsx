@@ -1,15 +1,31 @@
 import './Home.css';
 import { Canvas } from '@react-three/fiber';
-
 import Box from '../components/Prop';
-
 import { OrbitControls ,Stars} from '@react-three/drei';
-
 import { Button, Card, List, Typography } from '@mui/material';
 import Atom from '../components/Atom';
+import { useNavigate } from 'react-router-dom'
+import { UserAuth } from '../context/Authcontext';
+import { useEffect } from 'react';
 
 function Home(){
-  
+  const {logOut, user} = UserAuth();
+  const navigate = useNavigate();
+  useEffect(()=>
+  {
+    if(user==null)
+    navigate('/')  
+  },[user])
+
+  const handleLogout = async() =>
+  {
+    try{
+      await logOut()
+    }catch (error)
+    {
+      console.log(error)
+    }
+  }
 
   return (
     <>
@@ -53,6 +69,10 @@ function Home(){
           </div>
           
         </Card>
+
+        <Button variant='contained' color='secondary' onClick={handleLogout} sx={{marginTop:'15px'}} >
+          LogOut
+        </Button>
       </div>
 
     </div>

@@ -1,13 +1,13 @@
-.main
-{
+.main {
     background-color: black;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+  .button {
     display: flex;
-}
-.button
-{
-    position: absolute;
-    left: 50;
-}
+    justify-content: center;
+    width: 100%;
+  }
