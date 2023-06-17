@@ -1,0 +1,13 @@
+.main
+{
+    background-color: black;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+.button
+{
+    position: absolute;
+    left: 50;
+}
