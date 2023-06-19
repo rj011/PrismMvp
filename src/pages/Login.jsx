@@ -10,6 +10,7 @@ const Login = () => {
   useEffect(()=>
   {
     if(user!=null)
+    console.log("hiii",user.currentUser.get().getBasicProfile())
     navigate('/Home')  
   },[user])
 
