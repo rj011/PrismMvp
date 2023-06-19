@@ -80,36 +80,18 @@ function Home() {
     functionName: "mint",
     args: [getCallData.a, getCallData.b, getCallData.c, getCallData.Input],
   });
+/* global BigInt */
 
-
-  const { data, isLoading, isSuccess, write } = useContractWrite(zkpVaultMintConfig)
+  const { data, write } = useContractWrite({
+    ...zkpVaultContractConfig,
+    functionName: "mint",
+    args: [getCallData.a, getCallData.b, getCallData.c, getCallData.Input],
+  })
 
   React.useEffect(() => {
     console.log("Data:", data);
-
   }, [data]);
-  // const { isLoading, isSuccess } = useWaitForTransaction({
-  //   hash: data?.hash,
-  // })
 
-
-  //   const {
-  //   mintData,
-  //   mint,
-  //   isMintLoading,
-  //   isMintStarted,
-  //   mintError,
-  // } = useContractWrite(zkpVaultMintConfig);
-
-  // const {
-  //   txData,
-  //   txSuccess,
-  //   txError,
-  // } = useWaitForTransaction({
-  //   hash: mintData?.hash,
-  // });
-
-  // const isMinted = txSuccess;
 
   async function calculateProof() {
 
@@ -124,7 +106,6 @@ function Home() {
       proof,
       publicSignals
     )
-
     const argv = callData
       .replace(/["[\]\s]/g, "")
       .split(",")
@@ -137,10 +118,12 @@ function Home() {
     const c = [argv[6], argv[7]];
     const Input = [];
 
+
     for (let i = 8; i < argv.length; i++) {
       Input.push(argv[i]);
     }
 
+    Input.push(1)
 
 
     setCallData({ a, b, c, Input })
