@@ -297,7 +297,7 @@ function Home() {
               A new way to identify
             </Typography>
             <Typography variant="h5" align='center' sx={{ m: '20px', color: 'rebeccapurple' }}>
-              Mint your unique non fungible token using any of the following
+              Mint a unique non fungible token to generate your decentralised SSI 
             </Typography>
             <div id='list'>
               <List>
