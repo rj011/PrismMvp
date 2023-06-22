@@ -10,6 +10,8 @@ import { UserAuth } from '../context/Authcontext';
 import { useEffect } from 'react';
 import { ConnectKitButton } from "connectkit"
 import zkpVaultABI from "../zkVault.json"
+import Lottie from 'react-lottie';
+import animationData from '../lottie/99630-tick.json'
 import {
   useAccount,
   usePrepareContractWrite,
@@ -25,6 +27,25 @@ function Home() {
 
   const [getCallData, setCallData] = React.useState({})
   const { address, isConnected } = useAccount();
+  const [isgenerateProofClicked, setisGenerateProofClicked] = React. useState(false)
+  const [isClicked, setisClicked] = React.useState(false)
+  const [isCredSelected, setisCredSelected] = React.useState(false)
+  const [clickedButtons, setClickedButtons] = React.useState([])
+
+  const defaultOptions = {
+    loop: false,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
+    }
+  };
+
+  const handleClick = (buttonIndex) => {
+    const newClickedButtons = [...clickedButtons];
+    newClickedButtons[buttonIndex] = true;
+    setClickedButtons(newClickedButtons);
+  };
 
   const zkpVaultContractConfig = {
     address: "0xa2594512a75a09218e4d5a84365ad272a48d9699",
@@ -162,6 +183,8 @@ function Home() {
     }
   }
 
+  //var select = 'CHOOSE';
+
   return (
     <>
       <div style={{ height: '100vh', backgroundColor: 'black' }}>
@@ -174,12 +197,99 @@ function Home() {
           <Atom />
 
         </Canvas>
-        <div id='text'>
-          <h1></h1>
-        </div>
-        <div style={{ position: 'absolute', top: 24, right: 24 }}>
+        
+        <div style={{ position: 'absolute', top: 24, right: 24, display: 'flex' }}>
+          {
+            isCredSelected && (
+        <Lottie 
+	    options={defaultOptions}
+        height={40}
+        width={40}
+      />
+          )}
           <ConnectKitButton />
+          
         </div>
+
+
+        {
+         
+
+         isConnected && isgenerateProofClicked && (
+           <>
+           <div style={{display: 'flex',
+         justifyContent: 'space-between',
+         position: 'absolute',
+         width: '100%',
+         top: '20%',
+        right:'1%'}}>
+
+           <Card sx={{ display: 'block',
+         justifyContent: 'center',
+         position: 'absolute',
+         top: '25%',
+         right: '10%',
+         marginLeft:'30px',
+         zIndex:'200',
+          width:'260px',
+         backgroundColor: '#121212', borderRadius: '2%', opacity: '100%',
+         height:'50vh', padding:'15px'
+         }}>
+             <Typography variant="h5" align='center' sx={{ m: '20px', color: 'white' }}>
+             ALICE
+           </Typography>
+           <br/>
+           <Typography variant="h5" align='center' sx={{ m: '10px', color: 'rebeccapurple' }}>
+             Age: 21
+           </Typography>
+           <Typography variant="h5" align='center' sx={{ m:'10px', color: 'rebeccapurple' }}>
+             CIBIL: 98
+           </Typography>
+           <Typography variant="h5" align='center' sx={{  color: 'rebeccapurple' }}>
+             Nationality: IND
+           </Typography>
+           <Button variant='outlined' color='secondary' sx={{ width: '85%', margin: '10px'}} onClick={()=> {setisGenerateProofClicked(!isgenerateProofClicked);  setisClicked(!isClicked); setisCredSelected(!isCredSelected); handleClick(0) }}>
+            {clickedButtons[0] ? 'Drop' : 'Choose'}
+           </Button>
+           </Card>
+
+           <Card sx={{ display: 'block',
+         justifyContent: 'center',
+         position: 'absolute',
+         top: '25%',
+         right: '35%',
+         backgroundColor: '#121212', borderRadius: '2%', opacity: '100%',
+         zIndex:'200',
+         width:'260px',
+         height:'50vh', padding:'15px'
+         }}>
+             <Typography variant="h5" align='center' sx={{ m: '20px', color: 'white' }}>
+             BOB
+           </Typography>
+           <br/>
+           <Typography variant="h5" align='center' sx={{ m: '10px', color: 'rebeccapurple' }}>
+             Age: 32
+           </Typography>
+           <Typography variant="h5" align='center' sx={{ m: '10px', color: 'rebeccapurple' }}>
+             CIBIL: 56
+           </Typography>
+           <Typography variant="h5" align='center' sx={{ color: 'rebeccapurple' }}>
+             Nationality: AUS
+           </Typography>
+           
+           <Button variant='outlined' color='secondary' sx={{ width: '85%', margin: '10px'}} onClick={()=> {setisGenerateProofClicked(!isgenerateProofClicked);  setisClicked(!isClicked); setisCredSelected(!isCredSelected); handleClick(1);}}>
+             {clickedButtons[1] ? 'Drop' : 'Choose'}
+           </Button>
+           </Card>
+
+           
+           </div>
+           
+           </>
+         )}
+
+        
+        
         <div id='overlay'>
 
           <Card id='card' sx={{ backgroundColor: '#121212', borderRadius: '2%', opacity: '85%' }}>
@@ -197,16 +307,17 @@ function Home() {
                 <Button onClick={calculateProof} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
                   Issuance + Verification
                 </Button>
-                <Button variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
+                <Button onClick={() => setisGenerateProofClicked(!isgenerateProofClicked)} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
                   Generate Proof
                 </Button>
-                <Button onClick={() => { write() }} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
+                <Button onClick={() => { write() }} disabled={isClicked===false} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
                   Mint
                 </Button>
               </List>
             </div>
 
           </Card>
+          
 
           <Button onClick={handleLogout} variant='contained' color='secondary' sx={{ marginTop: '15px' }} >
             LogOut

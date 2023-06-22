@@ -30,5 +30,6 @@
 {
   display: flex;
   justify-content: center;
-  left: 10px;
+  position: absolute;
+  left: 50px;
 }
