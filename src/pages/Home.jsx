@@ -43,7 +43,7 @@ function Home() {
 
   const handleClick = (buttonIndex) => {
     const newClickedButtons = [...clickedButtons];
-    newClickedButtons[buttonIndex] = true;
+    newClickedButtons[buttonIndex] = !newClickedButtons[buttonIndex];
     setClickedButtons(newClickedButtons);
   };
 
