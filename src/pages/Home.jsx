@@ -116,6 +116,8 @@ function Home() {
 
   async function calculateProof() {
 
+    navigate('/Verification')
+
     const input = { age: 19, citizenship: 91, cibil: 120 }
 
     const { proof, publicSignals } =
@@ -304,7 +306,7 @@ function Home() {
                 <Button onClick={handleSignIn} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
                   GSignIn
                 </Button>
-                <Button onClick={calculateProof} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
+                <Button onClick={()=> {navigate('/Verification');}} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
                   Issuance + Verification
                 </Button>
                 <Button onClick={() => setisGenerateProofClicked(!isgenerateProofClicked)} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>

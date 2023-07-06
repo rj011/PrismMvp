@@ -14,6 +14,7 @@ import { InjectedConnector } from 'wagmi/connectors/injected'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { ConnectKitProvider } from "connectkit";
+import Verification from './pages/Verification';
 
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
@@ -69,6 +70,7 @@ function App(){
        
         {/* <Route path='/' element={<Login />} /> */}
         <Route path = '/' element={<Home />} />
+        <Route path='/Verification'  element={<Verification />} />
       </Routes>
       </ConnectKitProvider>
       </WagmiConfig>
