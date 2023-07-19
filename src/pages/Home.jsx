@@ -11,6 +11,8 @@ import { useEffect } from 'react';
 import { ConnectKitButton, useSIWE } from "connectkit"
 import zkpVaultABI from "../zkVault.json"
 import Lottie from 'react-lottie';
+import TextField from '@mui/material/TextField';
+
 import animationData from '../lottie/99630-tick.json'
 import {
   useAccount,
@@ -31,6 +33,13 @@ function Home() {
   const [isClicked, setisClicked] = React.useState(false)
   const [isCredSelected, setisCredSelected] = React.useState(false)
   const [clickedButtons, setClickedButtons] = React.useState([])
+  const navigate = useNavigate();
+
+  const [state, setState] = useState({
+    age: 4,
+    cibil: 16,
+    citizenship: 91
+  })
 
   const defaultOptions = {
     loop: false,
@@ -96,11 +105,7 @@ function Home() {
     }
   }, [sbtData]);
 
-  const zkpVaultMintConfig = usePrepareContractWrite({
-    ...zkpVaultContractConfig,
-    functionName: "mint",
-    args: [getCallData.a, getCallData.b, getCallData.c, getCallData.Input],
-  });
+
 /* global BigInt */
 
   const { data, write } = useContractWrite({
@@ -114,51 +119,51 @@ function Home() {
   }, [data]);
 
 
-  async function calculateProof() {
+  // async function calculateProof() {
 
-    navigate('/Verification')
+  //   navigate('/Verification')
 
-    const input = { age: 19, citizenship: 91, cibil: 120 }
+  //   const input = { age: 19, citizenship: 91, cibil: 120 }
 
-    const { proof, publicSignals } =
-      await snarkjs.groth16.fullProve(input, "http://localhost:8000/aadharCheck.wasm", "http://localhost:8000/aadharCheck.zkey");
-    console.log(proof);
-    console.log(publicSignals);
+  //   const { proof, publicSignals } =
+  //     await snarkjs.groth16.fullProve(input, "http://localhost:8000/aadharCheck.wasm", "http://localhost:8000/aadharCheck.zkey");
+  //   console.log(proof);
+  //   console.log(publicSignals);
 
-    const callData = await snarkjs.groth16.exportSolidityCallData(
-      proof,
-      publicSignals
-    )
-    const argv = callData
-      .replace(/["[\]\s]/g, "")
-      .split(",")
-      .map((x) => BigInt(x).toString());
-    const a = [argv[0], argv[1]];
-    const b = [
-      [argv[2], argv[3]],
-      [argv[4], argv[5]],
-    ];
-    const c = [argv[6], argv[7]];
-    const Input = [];
-
-
-    for (let i = 8; i < argv.length; i++) {
-      Input.push(argv[i]);
-    }
-
-    Input.push(1)
+  //   const callData = await snarkjs.groth16.exportSolidityCallData(
+  //     proof,
+  //     publicSignals
+  //   )
+  //   const argv = callData
+  //     .replace(/["[\]\s]/g, "")
+  //     .split(",")
+  //     .map((x) => BigInt(x).toString());
+  //   const a = [argv[0], argv[1]];
+  //   const b = [
+  //     [argv[2], argv[3]],
+  //     [argv[4], argv[5]],
+  //   ];
+  //   const c = [argv[6], argv[7]];
+  //   const Input = [];
 
 
-    setCallData({ a, b, c, Input })
+  //   for (let i = 8; i < argv.length; i++) {
+  //     Input.push(argv[i]);
+  //   }
 
-    console.log(proof);
-    const vkey = await fetch("http://localhost:8000/aadharCheck.vkey.json").then(function (res) {
-      return res.json();
-    });
-    const res = await snarkjs.groth16.verify(vkey, ['1'], proof);
-    console.log("Result:", res);
+  //   Input.push(1)
 
-  }
+
+  //   setCallData({ a, b, c, Input })
+
+  //   console.log(proof);
+  //   const vkey = await fetch("http://localhost:8000/aadharCheck.vkey.json").then(function (res) {
+  //     return res.json();
+  //   });
+  //   const res = await snarkjs.groth16.verify(vkey, ['1'], proof);
+  //   console.log("Result:", res);
+
+  // }
 
   const [getProof, setProof] = useState()
 
@@ -175,7 +180,7 @@ function Home() {
 
   async function calculateProofForAlice() {
 
-    const input = { age: 21, citizenship: 91, cibil: 105 }
+    const input = state
 
     const { proof, publicSignals } =
       await snarkjs.groth16.fullProve(input, "http://localhost:8000/aadharCheck.wasm", "http://localhost:8000/aadharCheck.zkey");
@@ -332,7 +337,7 @@ function Home() {
          top: '20%',
         right:'1%'}}>
 
-           <Card sx={{ display: 'block',
+           <Card sx={{ 
          justifyContent: 'center',
          position: 'absolute',
          top: '25%',
@@ -343,24 +348,55 @@ function Home() {
          backgroundColor: '#121212', borderRadius: '2%', opacity: '100%',
          height:'50vh', padding:'15px'
          }}>
+          <div style={{display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column'}}>
              <Typography variant="h5" align='center' sx={{ m: '20px', color: 'white' }}>
              ALICE
            </Typography>
+           
            <br/>
-           <Typography variant="h5" align='center' sx={{ m: '10px', color: 'rebeccapurple' }}>
-             Age: 21
-           </Typography>
-           <Typography variant="h5" align='center' sx={{ m:'10px', color: 'rebeccapurple' }}>
-             CIBIL: 105
-           </Typography>
-           <Typography variant="h5" align='center' sx={{  color: 'rebeccapurple' }}>
-             Nationality: IND
-           </Typography>
-           <Button variant='outlined' color='secondary' sx={{ width: '85%', margin: '10px'}} onClick={()=> {
+           <TextField style={{color:'white',borderColor:'#fffff',textDecorationColor:'#fffff',backgroundColor:'#fffff'}}
+          id="outlined-helperText"
+          color="secondary" focused
+          label="Age"
+          onChange={(e)=>setState({...state, age: e.target.value})}
+          sx={{
+                "& input": {
+                    color: '#656565',
+                    
+                }
+            }}
+        />
+           <TextField style={{color:'white',borderColor:'#fffff',textDecorationColor:'#fffff',backgroundColor:'#fffff',marginTop:16}}
+          id="outlined-helperText"
+          onChange={(e)=>setState({...state, cibil: e.target.value})}
+          color="secondary" focused
+          label="Cibil"
+          sx={{
+                "& input": {
+                    color: '#656565',
+                    
+                }
+            }}
+        />
+           <TextField style={{color:'white',borderColor:'#fffff',textDecorationColor:'#fffff',backgroundColor:'#fffff',marginTop:16}}
+          id="outlined-helperText"
+          color="secondary" focused
+          onChange={(e)=>setState({...state, citizenship: e.target.value})}
+
+          label="Nationality"
+          sx={{
+                "& input": {
+                    color: '#656565',
+                    
+                }
+            }}
+        />
+           <Button variant='outlined' color='secondary' sx={{ width: '85%', margin: '10px',marginTop:'32px'}} onClick={()=> {
             calculateProofForAlice()
             setisGenerateProofClicked(!isgenerateProofClicked);  setisClicked(!isClicked); setisCredSelected(!isCredSelected); handleClick(0) }}>
             {clickedButtons[0] ? 'Drop' : 'Choose'}
            </Button>
+           </div>
            </Card>
 
            <Card sx={{ display: 'block',
@@ -417,7 +453,7 @@ function Home() {
                   GSignIn
                 </Button>
                 <Button onClick={()=> {navigate('/Verification');}} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
-                  Issuance + Verification
+                  Verifiers Site
                 </Button>
                 <Button onClick={() => setisGenerateProofClicked(!isgenerateProofClicked)} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
                   Generate Proof
