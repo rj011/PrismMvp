@@ -1,5 +1,5 @@
 import './Home.css';
-import React from "react";
+import React, { useState } from "react";
 import { Canvas } from '@react-three/fiber';
 import Box from '../components/Prop';
 import { OrbitControls, Stars } from '@react-three/drei';
@@ -8,9 +8,11 @@ import Atom from '../components/Atom';
 import { useNavigate } from 'react-router-dom'
 import { UserAuth } from '../context/Authcontext';
 import { useEffect } from 'react';
-import { ConnectKitButton } from "connectkit"
+import { ConnectKitButton, useSIWE } from "connectkit"
 import zkpVaultABI from "../zkVault.json"
 import Lottie from 'react-lottie';
+import TextField from '@mui/material/TextField';
+
 import animationData from '../lottie/99630-tick.json'
 import {
   useAccount,
@@ -31,6 +33,13 @@ function Home() {
   const [isClicked, setisClicked] = React.useState(false)
   const [isCredSelected, setisCredSelected] = React.useState(false)
   const [clickedButtons, setClickedButtons] = React.useState([])
+  const navigate = useNavigate();
+
+  const [state, setState] = useState({
+    age: 4,
+    cibil: 16,
+    citizenship: 91
+  })
 
   const defaultOptions = {
     loop: false,
@@ -96,11 +105,7 @@ function Home() {
     }
   }, [sbtData]);
 
-  const zkpVaultMintConfig = usePrepareContractWrite({
-    ...zkpVaultContractConfig,
-    functionName: "mint",
-    args: [getCallData.a, getCallData.b, getCallData.c, getCallData.Input],
-  });
+
 /* global BigInt */
 
   const { data, write } = useContractWrite({
@@ -114,11 +119,68 @@ function Home() {
   }, [data]);
 
 
-  async function calculateProof() {
+  // async function calculateProof() {
 
-    navigate('/Verification')
+  //   navigate('/Verification')
 
-    const input = { age: 19, citizenship: 91, cibil: 120 }
+  //   const input = { age: 19, citizenship: 91, cibil: 120 }
+
+  //   const { proof, publicSignals } =
+  //     await snarkjs.groth16.fullProve(input, "http://localhost:8000/aadharCheck.wasm", "http://localhost:8000/aadharCheck.zkey");
+  //   console.log(proof);
+  //   console.log(publicSignals);
+
+  //   const callData = await snarkjs.groth16.exportSolidityCallData(
+  //     proof,
+  //     publicSignals
+  //   )
+  //   const argv = callData
+  //     .replace(/["[\]\s]/g, "")
+  //     .split(",")
+  //     .map((x) => BigInt(x).toString());
+  //   const a = [argv[0], argv[1]];
+  //   const b = [
+  //     [argv[2], argv[3]],
+  //     [argv[4], argv[5]],
+  //   ];
+  //   const c = [argv[6], argv[7]];
+  //   const Input = [];
+
+
+  //   for (let i = 8; i < argv.length; i++) {
+  //     Input.push(argv[i]);
+  //   }
+
+  //   Input.push(1)
+
+
+  //   setCallData({ a, b, c, Input })
+
+  //   console.log(proof);
+  //   const vkey = await fetch("http://localhost:8000/aadharCheck.vkey.json").then(function (res) {
+  //     return res.json();
+  //   });
+  //   const res = await snarkjs.groth16.verify(vkey, ['1'], proof);
+  //   console.log("Result:", res);
+
+  // }
+
+  const [getProof, setProof] = useState()
+
+  async function verify(){
+    console.log(getProof);
+    const vkey = await fetch("http://localhost:8000/aadharCheck.vkey.json").then(function (res) {
+      return res.json();
+    });
+
+
+    const res = await snarkjs.groth16.verify(vkey, ['1'], getProof);
+    console.log("Result:", res);
+  }
+
+  async function calculateProofForAlice() {
+
+    const input = state
 
     const { proof, publicSignals } =
       await snarkjs.groth16.fullProve(input, "http://localhost:8000/aadharCheck.wasm", "http://localhost:8000/aadharCheck.zkey");
@@ -155,8 +217,58 @@ function Home() {
     const vkey = await fetch("http://localhost:8000/aadharCheck.vkey.json").then(function (res) {
       return res.json();
     });
+
+    setProof(proof)
+
     const res = await snarkjs.groth16.verify(vkey, ['1'], proof);
-    console.log("Result:", res);
+    // console.log("Result:", res);
+
+  }
+
+  async function calculateProofForBob() {
+
+    const input = { age: 32, citizenship: 66, cibil: 56 }
+
+    const { proof, publicSignals } =
+      await snarkjs.groth16.fullProve(input, "http://localhost:8000/aadharCheck.wasm", "http://localhost:8000/aadharCheck.zkey");
+    console.log(proof);
+    console.log(publicSignals);
+
+    const callData = await snarkjs.groth16.exportSolidityCallData(
+      proof,
+      publicSignals
+    )
+    const argv = callData
+      .replace(/["[\]\s]/g, "")
+      .split(",")
+      .map((x) => BigInt(x).toString());
+    const a = [argv[0], argv[1]];
+    const b = [
+      [argv[2], argv[3]],
+      [argv[4], argv[5]],
+    ];
+    const c = [argv[6], argv[7]];
+    const Input = [];
+
+
+    for (let i = 8; i < argv.length; i++) {
+      Input.push(argv[i]);
+    }
+
+    Input.push(1)
+
+
+    setCallData({ a, b, c, Input })
+
+    console.log(proof);
+    const vkey = await fetch("http://localhost:8000/aadharCheck.vkey.json").then(function (res) {
+      return res.json();
+    });
+
+    setProof(proof)
+
+    const res = await snarkjs.groth16.verify(vkey, ['1'], proof);
+    // console.log("Result:", res);
 
   }
 
@@ -174,7 +286,6 @@ function Home() {
     }
   };
 
-  const navigate = useNavigate();
 
 
   const handleLogout = async () => {
@@ -226,7 +337,7 @@ function Home() {
          top: '20%',
         right:'1%'}}>
 
-           <Card sx={{ display: 'block',
+           <Card sx={{ 
          justifyContent: 'center',
          position: 'absolute',
          top: '25%',
@@ -237,22 +348,55 @@ function Home() {
          backgroundColor: '#121212', borderRadius: '2%', opacity: '100%',
          height:'50vh', padding:'15px'
          }}>
+          <div style={{display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column'}}>
              <Typography variant="h5" align='center' sx={{ m: '20px', color: 'white' }}>
              ALICE
            </Typography>
+           
            <br/>
-           <Typography variant="h5" align='center' sx={{ m: '10px', color: 'rebeccapurple' }}>
-             Age: 21
-           </Typography>
-           <Typography variant="h5" align='center' sx={{ m:'10px', color: 'rebeccapurple' }}>
-             CIBIL: 98
-           </Typography>
-           <Typography variant="h5" align='center' sx={{  color: 'rebeccapurple' }}>
-             Nationality: IND
-           </Typography>
-           <Button variant='outlined' color='secondary' sx={{ width: '85%', margin: '10px'}} onClick={()=> {setisGenerateProofClicked(!isgenerateProofClicked);  setisClicked(!isClicked); setisCredSelected(!isCredSelected); handleClick(0) }}>
+           <TextField style={{color:'white',borderColor:'#fffff',textDecorationColor:'#fffff',backgroundColor:'#fffff'}}
+          id="outlined-helperText"
+          color="secondary" focused
+          label="Age"
+          onChange={(e)=>setState({...state, age: e.target.value})}
+          sx={{
+                "& input": {
+                    color: '#656565',
+                    
+                }
+            }}
+        />
+           <TextField style={{color:'white',borderColor:'#fffff',textDecorationColor:'#fffff',backgroundColor:'#fffff',marginTop:16}}
+          id="outlined-helperText"
+          onChange={(e)=>setState({...state, cibil: e.target.value})}
+          color="secondary" focused
+          label="Cibil"
+          sx={{
+                "& input": {
+                    color: '#656565',
+                    
+                }
+            }}
+        />
+           <TextField style={{color:'white',borderColor:'#fffff',textDecorationColor:'#fffff',backgroundColor:'#fffff',marginTop:16}}
+          id="outlined-helperText"
+          color="secondary" focused
+          onChange={(e)=>setState({...state, citizenship: e.target.value})}
+
+          label="Nationality"
+          sx={{
+                "& input": {
+                    color: '#656565',
+                    
+                }
+            }}
+        />
+           <Button variant='outlined' color='secondary' sx={{ width: '85%', margin: '10px',marginTop:'32px'}} onClick={()=> {
+            calculateProofForAlice()
+            setisGenerateProofClicked(!isgenerateProofClicked);  setisClicked(!isClicked); setisCredSelected(!isCredSelected); handleClick(0) }}>
             {clickedButtons[0] ? 'Drop' : 'Choose'}
            </Button>
+           </div>
            </Card>
 
            <Card sx={{ display: 'block',
@@ -279,7 +423,9 @@ function Home() {
              Nationality: AUS
            </Typography>
            
-           <Button variant='outlined' color='secondary' sx={{ width: '85%', margin: '10px'}} onClick={()=> {setisGenerateProofClicked(!isgenerateProofClicked);  setisClicked(!isClicked); setisCredSelected(!isCredSelected); handleClick(1);}}>
+           <Button variant='outlined' color='secondary' sx={{ width: '85%', margin: '10px'}} onClick={()=> {
+            calculateProofForBob()
+            setisGenerateProofClicked(!isgenerateProofClicked);  setisClicked(!isClicked); setisCredSelected(!isCredSelected); handleClick(1);}}>
              {clickedButtons[1] ? 'Drop' : 'Choose'}
            </Button>
            </Card>
@@ -299,7 +445,7 @@ function Home() {
               A new way to identify
             </Typography>
             <Typography variant="h5" align='center' sx={{ m: '20px', color: 'rebeccapurple' }}>
-              Mint a unique non fungible token to generate your decentralised SSI 
+              Mint your Soulbound token and generate your decentralised SSI to put yourself in control of your data, identity, and finances is the grand online dream of web3.
             </Typography>
             <div id='list'>
               <List>
@@ -307,10 +453,13 @@ function Home() {
                   GSignIn
                 </Button>
                 <Button onClick={()=> {navigate('/Verification');}} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
-                  Issuance + Verification
+                  Verifiers Site
                 </Button>
                 <Button onClick={() => setisGenerateProofClicked(!isgenerateProofClicked)} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
                   Generate Proof
+                </Button>
+                <Button onClick={() => {verify()}} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
+                  Verify Proof
                 </Button>
                 <Button onClick={() => { write() }} disabled={isClicked===false} variant='contained' color='secondary' sx={{ width: '85%', marginTop: '20px' }}>
                   Mint
